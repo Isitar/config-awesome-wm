@@ -177,7 +177,7 @@ awful.screen.connect_for_each_screen(function(s)
 
     if screen_i == 0 then
         -- Each screen has its own tag table.
-        local names = {"main", "2", "3", "4", "5", "6", "7", "max", "max" }
+        local names = {"main", "2", "3", "4", "5", "6", "7", "music", "max" }
         local l = awful.layout.suit
         local layouts = {l.floating, lain.layout.centerwork, l.tile, l.tile, l.tile, l.tile, l.tile, l.max, l.max}
 
@@ -622,5 +622,17 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- }}}
 
 
+-- custom part
+-- monitor rendering
 awful.spawn("xrandr --output DP-0 --primary --mode 2560x1440 --rate 60 --output HDMI-0 --mode 1920x1080 --rate 60 --right-of DP-0")
+-- transition / animation
 awful.spawn.with_shell("compton")
+
+-- spotify
+awful.spawn("spotify")
+client.connect_signal("property::class", function(c)
+    if "Spotify" == c.class then
+        local t = awful.tag.find_by_name(awful.screen.focused(), "music")
+        c:move_to_tag(t)
+    end
+end)
