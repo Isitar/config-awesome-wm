@@ -220,10 +220,33 @@ awful.screen.connect_for_each_screen(function(s)
     s.mywibox = awful.wibar({ position = "bottom", screen = s })
 
     -- custom widgets
-    local volume = lain.widget.pulsebar {
-        settings = function() end
-    }
+    local volume = lain.widget.alsabar(
+        {
+            width=200,height=10, followtag=true
+        }
+    )
 
+    volume.bar:buttons(awful.util.table.join(
+        awful.button({}, 1, function() -- left click
+            awful.spawn(string.format("%s -e alsamixer", terminal))
+        end),
+        awful.button({}, 2, function() -- middle click
+            os.execute(string.format("%s set %s 100%%", volume.cmd, volume.channel))
+            volume.update()
+        end),
+        awful.button({}, 3, function() -- right click
+            os.execute(string.format("%s set %s toggle", volume.cmd, volume.togglechannel or volume.channel))
+            volume.update()
+        end),
+        awful.button({}, 4, function() -- scroll up
+            os.execute(string.format("%s set %s 1%%+", volume.cmd, volume.channel))
+            volume.update()
+        end),
+        awful.button({}, 5, function() -- scroll down
+            os.execute(string.format("%s set %s 1%%-", volume.cmd, volume.channel))
+            volume.update()
+        end)
+    ))
 
     -- Add widgets to the wibox
     s.mywibox:setup {
@@ -240,7 +263,7 @@ awful.screen.connect_for_each_screen(function(s)
             mykeyboardlayout,
             wibox.widget.systray(),
             mytextclock,
-            volume.widget,
+            volume.bar,
             s.mylayoutbox,
         },
     }
