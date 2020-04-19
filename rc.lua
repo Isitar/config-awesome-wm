@@ -183,7 +183,7 @@ awful.screen.connect_for_each_screen(function(s)
 
         awful.tag(names, s, layouts)
     else
-        local names = {"1", "2", "3", "4", "5", "6", "7", "max", "max" }
+        local names = {"1", "2", "3", "4", "5", "6", "7", "browser", "discord" }
         local l = awful.layout.suit
         local layouts = {l.floating, l.tile, l.tile, l.tile, l.tile, l.tile, l.tile, l.max, l.max}
 
@@ -557,8 +557,9 @@ awful.rules.rules = {
     },
 
     -- Set Firefox to always map on the tag named "2" on screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { screen = 1, tag = "2" } },
+     { rule = { class = "[Dd]iscord" },
+       properties = { screen = 2, tag = "discord" } },
+
 }
 -- }}}
 
@@ -635,9 +636,12 @@ awful.spawn.with_shell("compton")
 
 -- spotify
 awful.spawn("spotify")
+-- awful.spawn.with_shell("cvlc --repeat 10hz_tone.wav")
+
+-- because rules dont work for spotify?
 client.connect_signal("property::class", function(c)
     if "Spotify" == c.class then
-        local t = awful.tag.find_by_name(awful.screen.focused(), "music")
+        local t = awful.tag.find_by_name(nil, "music")
         c:move_to_tag(t)
     end
 end)
