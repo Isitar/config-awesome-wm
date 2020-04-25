@@ -222,7 +222,7 @@ awful.screen.connect_for_each_screen(function(s)
     -- custom widgets
     local volume = lain.widget.alsabar(
         {
-            width=200,height=10, followtag=true
+            width=150,height=10, followtag=true
         }
     )
 
@@ -248,12 +248,32 @@ awful.screen.connect_for_each_screen(function(s)
         end)
     ))
 
+    -- shutdown button
+--     local btn_shutdown = awful.widget.button({image = beautiful.awesome_icon})
+--    btn_shutdown:buttons(awful.util.table.join(
+--        awful.button({}, 1, function()
+--          awful.spawn("shutdown -h now")
+--        end)
+--    ))
+
+    -- custom menu
+    start_menu_items = {
+      { "shutdown", function() awful.spawn("shutdown -h now") end },
+      { "restart", function() awful.spawn("shudown -rh now") end }
+    }
+
+    start_menu = awful.menu({ items = start_menu_items })
+
+    start_menu_launcher = awful.widget.launcher({ image = beautiful.start_icon,
+                                         menu = start_menu })
+
+
     -- Add widgets to the wibox
     s.mywibox:setup {
         layout = wibox.layout.align.horizontal,
         { -- Left widgets
             layout = wibox.layout.fixed.horizontal,
-            mylauncher,
+            start_menu_launcher,
             s.mytaglist,
             s.mypromptbox,
         },
