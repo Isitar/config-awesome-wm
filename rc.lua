@@ -656,7 +656,7 @@ awful.spawn.with_shell("compton")
 
 -- spotify
 awful.spawn("spotify")
--- awful.spawn.with_shell("cvlc --repeat 10hz_tone.wav")
+awful.spawn("cvlc ~/Projects/KRK_stayawake/10hz_tone.wav --repeat")
 
 -- because rules dont work for spotify?
 client.connect_signal("property::class", function(c)
