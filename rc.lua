@@ -210,7 +210,6 @@ awful.screen.connect_for_each_screen(function(s)
     local volume = lain.widget.alsabar(
         {
             width      = beautiful.sound_bar_width,
-            height     = beautiful.sound_bar_height,
             followtag  = true,
             colors = {
                 background = beautiful.sound_bar_bg,

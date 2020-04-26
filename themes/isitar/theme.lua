@@ -1,5 +1,5 @@
 ---------------------------
--- Default awesome theme --
+-- Isiatr awesome theme --
 ---------------------------
 
 local theme_assets = require("beautiful.theme_assets")
@@ -13,14 +13,16 @@ local theme = {}
 
 theme.font          = "Open Sans 9"
 
-local primary = "#424242"
-local primary_light = "#6d6d6d"
-local primary_dark = "#1b1b1b"
+theme.colors = {}
+
+theme.colors.primary = "#424242"
+theme.colors.primary_light = "#6d6d6d"
+theme.colors.primary_dark = "#1b1b1b"
 
 -- green
-local accent       = "#1b5e20"
-local accent_light = "#4c8c4a"
-local accent_dark  = "#003300"
+theme.colors.accent       = "#1b5e20"
+theme.colors.accent_light = "#4c8c4a"
+theme.colors.accent_dark  = "#003300"
 
 -- red
 -- local accent       = "#c62828"
@@ -28,8 +30,8 @@ local accent_dark  = "#003300"
 -- local accent_dark  = "#8e0000"
 
 
-theme.bg_normal     = primary_dark
-theme.bg_focus      = primary
+theme.bg_normal     = theme.colors.primary_dark
+theme.bg_focus      = theme.colors.primary
 theme.bg_urgent     = "#ff0000"
 theme.bg_minimize   = "#444444"
 theme.bg_systray    = theme.bg_normal
@@ -41,8 +43,8 @@ theme.fg_minimize   = "#ffffff"
 
 theme.useless_gap   = dpi(4)
 theme.border_width  = dpi(2)
-theme.border_normal = primary_dark
-theme.border_focus  = primary_light
+theme.border_normal = theme.colors.primary_dark
+theme.border_focus  = theme.colors.primary_light
 theme.border_marked = "#91231c"
 
 -- There are other variable sets
@@ -82,11 +84,10 @@ theme.taglist_squares_unsel = theme_assets.taglist_squares_unsel(
 
 theme.toolbar_height = dpi(30)
 
-theme.sound_bar_height = theme.toolbar_height
 theme.sound_bar_width = dpi(100)
-theme.sound_bar_bg = primary_dark
-theme.sound_bar_volume_color = accent
-theme.sound_bar_muted_color = accent_light
+theme.sound_bar_bg = theme.colors.primary_dark
+theme.sound_bar_volume_color = theme.colors.accent
+theme.sound_bar_muted_color = theme.colors.accent_light
 
 -- You can add as many variables as
 -- you wish and access them by using
