@@ -17,6 +17,17 @@ local primary = "#424242"
 local primary_light = "#6d6d6d"
 local primary_dark = "#1b1b1b"
 
+-- green
+local accent       = "#1b5e20"
+local accent_light = "#4c8c4a"
+local accent_dark  = "#003300"
+
+-- red
+-- local accent       = "#c62828"
+-- local accent_light = "#ff5f52"
+-- local accent_dark  = "#8e0000"
+
+
 theme.bg_normal     = primary_dark
 theme.bg_focus      = primary
 theme.bg_urgent     = "#ff0000"
@@ -68,9 +79,14 @@ theme.taglist_squares_unsel = theme_assets.taglist_squares_unsel(
 -- Variables set for theming the menu:
 -- menu_[bg|fg]_[normal|focus]
 -- menu_[border_color|border_width]
-theme.menu_submenu_icon = theme_path.."submenu.png"
-theme.menu_height = dpi(15)
-theme.menu_width  = dpi(100)
+
+theme.toolbar_height = dpi(30)
+
+theme.sound_bar_height = theme.toolbar_height
+theme.sound_bar_width = dpi(100)
+theme.sound_bar_bg = primary_dark
+theme.sound_bar_volume_color = accent
+theme.sound_bar_muted_color = accent_light
 
 -- You can add as many variables as
 -- you wish and access them by using
@@ -126,7 +142,7 @@ theme.layout_cornerse = theme_path.."layouts/cornersew.png"
 
 -- Generate Awesome icon:
 theme.awesome_icon = theme_assets.awesome_icon(
-    theme.menu_height, theme.bg_focus, theme.fg_focus
+    theme.toolbar_height, theme.bg_focus, theme.fg_focus
 )
 
 theme.start_icon = theme_path.."isitar.png"

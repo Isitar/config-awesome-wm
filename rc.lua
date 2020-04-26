@@ -88,23 +88,6 @@ awful.layout.layouts = {
 -- }}}
 
 -- {{{ Menu
--- Create a launcher widget and a main menu
-myawesomemenu = {
-   { "hotkeys", function() hotkeys_popup.show_help(nil, awful.screen.focused()) end },
-   { "manual", terminal .. " -e man awesome" },
-   { "edit config", editor_cmd .. " " .. awesome.conffile },
-   { "restart", awesome.restart },
-   { "quit", function() awesome.quit() end },
-}
-
-mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "open terminal", terminal }
-                                  }
-                        })
-
-mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
-                                     menu = mymainmenu })
-
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
@@ -217,12 +200,23 @@ awful.screen.connect_for_each_screen(function(s)
     }
 
     -- Create the wibox
-    s.mywibox = awful.wibar({ position = "bottom", screen = s })
+    s.mywibox = awful.wibar({ 
+        position = "bottom", 
+        screen = s,
+        height = beautiful.toolbar_height
+    })
 
     -- custom widgets
     local volume = lain.widget.alsabar(
         {
-            width=150,height=10, followtag=true
+            width      = beautiful.sound_bar_width,
+            height     = beautiful.sound_bar_height,
+            followtag  = true,
+            colors = {
+                background = beautiful.sound_bar_bg,
+                mute       = beautiful.sound_bar_muted_color,
+                unmute     = beautiful.sound_bar_volume_color
+            }
         }
     )
 
@@ -293,7 +287,6 @@ end)
 
 -- {{{ Mouse bindings
 root.buttons(gears.table.join(
-    awful.button({ }, 3, function () mymainmenu:toggle() end),
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
 ))
@@ -322,8 +315,6 @@ globalkeys = gears.table.join(
         end,
         {description = "focus previous by index", group = "client"}
     ),
-    awful.key({ modkey,           }, "w", function () mymainmenu:show() end,
-              {description = "show main menu", group = "awesome"}),
 
     -- Layout manipulation
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end,
@@ -655,8 +646,8 @@ awful.spawn("xrandr --output DP-0 --primary --mode 2560x1440 --rate 60 --output 
 awful.spawn.with_shell("compton")
 
 -- spotify
-awful.spawn("spotify")
-awful.spawn("cvlc ~/Projects/KRK_stayawake/10hz_tone.wav --repeat")
+-- awful.spawn("spotify")
+-- awful.spawn("cvlc ~/Projects/KRK_stayawake/10hz_tone.wav --repeat")
 
 -- because rules dont work for spotify?
 client.connect_signal("property::class", function(c)
