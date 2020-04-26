@@ -645,8 +645,8 @@ awful.spawn("xrandr --output DP-0 --primary --mode 2560x1440 --rate 60 --output 
 awful.spawn.with_shell("compton")
 
 -- spotify
--- awful.spawn("spotify")
--- awful.spawn("cvlc ~/Projects/KRK_stayawake/10hz_tone.wav --repeat")
+awful.spawn("spotify")
+awful.spawn("cvlc ~/Projects/KRK_stayawake/10hz_tone.wav --repeat")
 
 -- because rules dont work for spotify?
 client.connect_signal("property::class", function(c)
