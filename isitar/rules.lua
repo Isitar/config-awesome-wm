@@ -112,7 +112,7 @@ function rules.rules(beautiful)
             }
         }, properties = { floating = true }},
 
-        -- Add titlebars to normal clients and dialogs
+        -- Add titlebars to normal clients and dialogs except gnome terminal
         { 
             rule_any = {type = { "normal", "dialog" }},
             except_any = { class = { "Gnome-terminal"} },
@@ -131,5 +131,13 @@ function rules.rules(beautiful)
         },
     }    
 end
+
+-- extended rule because spotify does not have class property on startup
+client.connect_signal("property::class", function(c)
+     if "Spotify" == c.class then
+         local t = awful.tag.find_by_name(nil, "music")
+         c:move_to_tag(t)
+     end
+end)
 
 return rules;
