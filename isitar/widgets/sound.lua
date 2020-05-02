@@ -21,6 +21,9 @@ local function factory(args)
     props.muted_color = args.muted_color or gears.color("#ff0000")
     props.max_width = args.max_width or 200
     props.num_bars = args.num_bars or 4
+
+    props.speaker_padding_top = args.speaker_padding_top or 0.1
+    props.speaker_padding_bottom = args.speaker_padding_bottom or 0.1
     props.padding_top = args.padding_top or 0.1
     props.padding_bottom = args.padding_bottom or 0.1
     
@@ -56,9 +59,7 @@ local function factory(args)
         
         local triangle_width = 0.2 * width;
 
-        local pt = props.padding_top * height
-        local bar_height = height - pt - props.padding_bottom * height
-
+        
   
         if (props.muted) then
             cr:set_source(props.muted_color)            
@@ -67,7 +68,13 @@ local function factory(args)
         end
 
         -- draw sepaker
-        draw_speaker(cr, 0, pt, triangle_width, bar_height)
+        local speaker_pt = props.speaker_padding_top * height
+        local speaker_height = height - speaker_pt - props.speaker_padding_bottom * height
+
+        draw_speaker(cr, 0, speaker_pt, triangle_width, speaker_height)
+
+        local pt = props.padding_top * height
+        local bar_height = height - pt - props.padding_bottom * height
 
         if (props.muted) then                
             cr:move_to(0,0)

@@ -210,7 +210,11 @@ awful.screen.connect_for_each_screen(function(s)
         max_width = 100,
         main_color = gears.color(beautiful.sound_bar_volume_color),
         muted_color = gears.color(beautiful.sound_bar_muted_color),
-        num_bars = 20
+        num_bars = 20,
+        speaker_padding_top = 0.1,
+        speaker_padding_bottom = 0.1,
+        padding_top = 0.3,
+        padding_bottom = 0.3
     })
 
     -- custom menu
