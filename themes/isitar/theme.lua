@@ -87,7 +87,7 @@ theme.toolbar_height = dpi(30)
 theme.sound_bar_width = dpi(100)
 theme.sound_bar_bg = theme.colors.primary_dark
 theme.sound_bar_volume_color = theme.colors.accent
-theme.sound_bar_muted_color = theme.colors.accent_light
+theme.sound_bar_muted_color = theme.colors.accent_dark
 
 -- You can add as many variables as
 -- you wish and access them by using
