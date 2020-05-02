@@ -491,6 +491,6 @@ end)
 
 
 local autostart = require("isitar.autostart")
--- autostart.autostart()
+autostart.autostart()
 
 

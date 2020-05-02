@@ -24,6 +24,8 @@ local function factory(args)
     props.muted = false
     props.level = 100
 
+    props.padding_top = args.padding_top or 0.1
+    props.padding_bottom = args.padding_bottom or 0.1
     
 
     
@@ -38,10 +40,25 @@ local function factory(args)
         cr:fill()
     end
 
+    function draw_speaker(cr, x0, y0, width, height)                        
+        -- start left middle
+        cr:move_to(x0, y0 + 0.5 * height)
+        -- curve to top right
+        cr:curve_to(x0 + 0.75 * width, y0 + 0.375 * height,  x0 + width, y0, x0 + width, y0)      
+        -- line down
+        cr:line_to(x0 + width  , y0 + height)
+        -- curve back up
+        cr:curve_to(x0 + 0.75 * width, y0 + 0.625 * height, x0, y0 + 0.5 * height, x0, y0 + 0.5 * height)        
+        cr:fill()
+    end
+
     -- called when to draw the widget
     function widget:draw(context, cr, width, height)
         
         local triangle_width = 0.2 * width;
+
+        local pt = props.padding_top * height
+        local bar_height = height - pt - props.padding_bottom * height
 
   
         if (props.muted) then
@@ -50,16 +67,12 @@ local function factory(args)
             cr:set_source(props.main_color)
         end
 
-        -- triangle
-        cr:move_to(0               ,0.5 * height)
-        cr:line_to(triangle_width  ,0)
-        cr:line_to(triangle_width  ,height)
-        cr:line_to(0               ,0.5 * height)        
-        cr:fill()
+        -- draw sepaker
+        draw_speaker(cr, 0, pt, triangle_width, bar_height)
 
-        if (props.muted) then                    
+        if (props.muted) then                
             cr:move_to(0,0)
-            cr:line_to(triangle_width, height)
+            cr:line_to(2 * triangle_width, height)
             cr:stroke()
         end
         -- draw bars
@@ -71,7 +84,7 @@ local function factory(args)
             else
                 cr:set_source(props.main_color)
             end
-            draw_bar(cr, triangle_width + (i * bar_space) + bar_width, 0, bar_width, height)
+            draw_bar(cr, triangle_width + (i * bar_space) + bar_width, pt, bar_width, bar_height)
         end
         
     end
