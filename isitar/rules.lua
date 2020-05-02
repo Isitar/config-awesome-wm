@@ -83,43 +83,52 @@ function rules.rules(beautiful)
         -- Floating clients.
         { rule_any = {
             instance = {
-            "DTA",  -- Firefox addon DownThemAll.
-            "copyq",  -- Includes session name in class.
-            "pinentry",
+                "DTA",  -- Firefox addon DownThemAll.
+                "copyq",  -- Includes session name in class.
+                "pinentry",
             },
             class = {
-            "Arandr",
-            "Blueman-manager",
-            "Gpick",
-            "Kruler",
-            "MessageWin",  -- kalarm.
-            "Sxiv",
-            "Tor Browser", -- Needs a fixed window size to avoid fingerprinting by screen size.
-            "Wpa_gui",
-            "veromix",
-            "xtightvncviewer"},
+                "Arandr",
+                "Blueman-manager",
+                "Gpick",
+                "Kruler",
+                "MessageWin",  -- kalarm.
+                "Sxiv",
+                "Tor Browser", -- Needs a fixed window size to avoid fingerprinting by screen size.
+                "Wpa_gui",
+                "veromix",
+                "xtightvncviewer"
+            },
 
             -- Note that the name property shown in xprop might be set slightly after creation of the client
             -- and the name shown there might not match defined rules here.
             name = {
-            "Event Tester",  -- xev.
+                "Event Tester",  -- xev.
             },
             role = {
-            "AlarmWindow",  -- Thunderbird's calendar.
-            "ConfigManager",  -- Thunderbird's about:config.
-            "pop-up",       -- e.g. Google Chrome's (detached) Developer Tools.
+                "AlarmWindow",  -- Thunderbird's calendar.
+                "ConfigManager",  -- Thunderbird's about:config.
+                "pop-up",       -- e.g. Google Chrome's (detached) Developer Tools.
             }
         }, properties = { floating = true }},
 
         -- Add titlebars to normal clients and dialogs
-        { rule_any = {type = { "normal", "dialog" }
-        }, properties = { titlebars_enabled = true }
+        { 
+            rule_any = {type = { "normal", "dialog" }},
+            except_any = { class = { "Gnome-terminal"} },
+            properties = { titlebars_enabled = true }
         },
 
         -- Set Discord to always map on the tag named "discord" on screen 2.
-        { rule = { class = "[Dd]iscord" },
-        properties = { screen = 2, tag = "discord" } },
-
+        {
+            rule = { class = "[Dd]iscord" },
+            properties = { screen = 2, tag = "discord" } 
+        },
+        -- spotify always in music tag on screen 1
+        {
+            rule = { class = "[Ss]potify"}, 
+            properties = { screen = 1, tag = "music"} 
+        },
     }    
 end
 

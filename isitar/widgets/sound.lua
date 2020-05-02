@@ -13,34 +13,33 @@ local function factory(args)
     local props = {}
 
     props.args = args or {}
+    -- functional args
+    props.cmd = args.cmd or "amixer"
+    props.channel = args.channel or "Master"
+    -- style args
     props.main_color = args.main_color or gears.color("#00ff00")
     props.muted_color = args.muted_color or gears.color("#ff0000")
     props.max_width = args.max_width or 200
     props.num_bars = args.num_bars or 4
-    props.cmd = args.cmd or "amixer"
-    props.channel = args.channel or "Master"
-
-
-    props.muted = false
-    props.level = 100
-
     props.padding_top = args.padding_top or 0.1
     props.padding_bottom = args.padding_bottom or 0.1
     
-
-    
+    -- internal props
+    props.muted = false
+    props.level = 100
 
     -- function to get the required space
     function widget:fit(context, width, height)
         return math.min(props.max_width, width), height
     end
 
-    function draw_bar(cr, x0, y0, width, height)        
+    
+    local function draw_bar(cr, x0, y0, width, height)        
         cr:rectangle(x0,y0,width,height)
         cr:fill()
     end
 
-    function draw_speaker(cr, x0, y0, width, height)                        
+    local function draw_speaker(cr, x0, y0, width, height)                        
         -- start left middle
         cr:move_to(x0, y0 + 0.5 * height)
         -- curve to top right
@@ -107,29 +106,50 @@ local function factory(args)
         end)
     end
 
+    function widget:open_mixer()
+        awful.spawn(string.format("%s -e alsamixer", terminal))
+        widget:update_props()
+    end
 
+    function widget:toggle_mute()
+        os.execute(string.format("%s set %s toggle", props.cmd, props.channel))
+        widget:update_props()
+    end
+
+    function widget:full_power()
+        if (props.muted) then
+            widget:toggle_mute()
+        end
+        os.execute(string.format("%s set %s 100%%", props.cmd, props.channel))
+        widget:update_props()
+    end
+
+    function widget:increse_volume()
+        os.execute(string.format("%s set %s 1%%+", props.cmd, props.channel))
+        widget:update_props()
+    end
+
+    function widget:decrease_volume()
+        os.execute(string.format("%s set %s 1%%-", props.cmd, props.channel))
+        widget:update_props()
+    end
 
     -- button / keybindings
     widget:buttons(awful.util.table.join(
         awful.button({}, 1, function() -- left click                        
-            awful.spawn(string.format("%s -e alsamixer", terminal))
-            widget:update_props()
+            widget:open_mixer()
         end),
         awful.button({}, 2, function() -- middle click
-           os.execute(string.format("%s set %s 100%%", props.cmd, props.channel))
-           widget:update_props()
+            widget:full_power()
         end),
         awful.button({}, 3, function() -- right click
-            os.execute(string.format("%s set %s toggle", props.cmd, props.channel))
-            widget:update_props()
+           widget:toggle_mute()
         end),
         awful.button({}, 4, function() -- scroll up
-            os.execute(string.format("%s set %s 1%%+", props.cmd, props.channel))
-            widget:update_props()
+            widget:increse_volume()
         end),
         awful.button({}, 5, function() -- scroll down
-            os.execute(string.format("%s set %s 1%%-", props.cmd, props.channel))
-            widget:update_props()
+            widget:decrease_volume()
         end)
     ))
 

@@ -76,14 +76,12 @@ awful.layout.layouts = {
 --    awful.layout.suit.spiral,
 --    awful.layout.suit.spiral.dwindle,
     awful.layout.suit.max,
-    awful.layout.suit.max.fullscreen,
+    awful.layout.suit.max.fullscreen
 --    awful.layout.suit.magnifier,
 --    awful.layout.suit.corner.nw,
     -- awful.layout.suit.corner.ne,
     -- awful.layout.suit.corner.sw,
     -- awful.layout.suit.corner.se,
-    lain.layout.termfair.center,
-    lain.layout.centerwork,
 }
 -- }}}
 
@@ -162,7 +160,7 @@ awful.screen.connect_for_each_screen(function(s)
         -- Each screen has its own tag table.
         local names = {"main", "2", "3", "4", "5", "6", "7", "music", "max" }
         local l = awful.layout.suit
-        local layouts = {l.floating, lain.layout.centerwork, l.tile, l.tile, l.tile, l.tile, l.tile, l.max, l.max}
+        local layouts = {l.floating, l.fair.horizontal, l.tile, l.tile, l.tile, l.tile, l.tile, l.max, l.max}
 
         awful.tag(names, s, layouts)
     else
@@ -478,17 +476,6 @@ end)
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
-
-
-
--- because rules dont work for spotify?
-client.connect_signal("property::class", function(c)
-    if "Spotify" == c.class then
-        local t = awful.tag.find_by_name(nil, "music")
-        c:move_to_tag(t)
-    end
-end)
-
 
 local autostart = require("isitar.autostart")
 autostart.autostart()
