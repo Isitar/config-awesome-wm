@@ -15,18 +15,23 @@ local function factory(args)
 
     args = args or {}
     -- functional args
-    props.cmd = args.cmd or "cat"
-    props.path = args.path or "/sys/class/hwmon/hwmon2/temp1_input"
+    props.temp_cmd = args.temp_cmd or "cat"
+	props.temp_path = args.temp_path or "/sys/class/hwmon/hwmon2/temp1_input"
+	props.usage_cmd = args.usage_cmd or "cat"
+    props.usage_path = args.usage_path or "/proc/stat"
     -- style args
     props.main_color = args.main_color or gears.color("#00ff00")
 	props.danger_color = args.danger_color or gears.color("#ff0000")
-	props.danger_threshold_deg = args.danger_threshold_deg or 75
+	props.temp_danger_threshold_deg = args.temp_danger_threshold_deg or 75
     props.font_family = args.font_family or "Courier"    
 
 	props.padding = args.padding or 0.1
 
     -- internal props
-    props.temp_mdeg = 0    
+	props.temp_mdeg = 0    
+	props.idle_last = {0}
+	props.total_last = {0}
+	props.load_percentage = {0}	
 
     -- function to get the required space
 	function widget:fit(context, width, height)		
@@ -39,7 +44,7 @@ local function factory(args)
 
     -- called when to draw the widget
 	function widget:draw(context, cr, width, height)
-		if (props.temp_mdeg / 1000 < props.danger_threshold_deg) then
+		if (props.temp_mdeg / 1000 < props.temp_danger_threshold_deg) then
 			cr:set_source(props.main_color)
 		else
 			cr:set_source(props.danger_color)
@@ -100,23 +105,66 @@ local function factory(args)
         cr:set_font_size(font_size * 1.3)
         cr:show_text(math.floor(props.temp_mdeg / 1000) .. "°")
 
+		local cnt = 0
+		cores_per_col = 10
+		for i,perc in pairs(props.load_percentage) do
+			x = width + ((i-1) // cores_per_col) * 70
+			y = y0 + ((i-1) % cores_per_col) * 20
+		
+			if (perc < 75) then
+				cr:set_source(props.main_color)
+			else
+				cr:set_source(props.danger_color)
+			end
+			
+			cr:move_to(x, y)
+			cr:set_font_size(15)
+			cr:show_text(i .. ": " .. perc)		
+		end
     end
 
     -- refresh props based on real values
-    function widget:update_props()
-        local format_cmd = string.format("%s %s", props.cmd, props.path)
-        helpers.async(format_cmd, function(temp_str)
+    function widget:update_props()        
+        helpers.async(string.format("%s %s", props.temp_cmd, props.temp_path), function(temp_str)
             local temp_mdeg = tonumber(temp_str)
             
             if temp_mdeg ~= props.temp_mdegthen then
                 props.temp_mdeg = temp_mdeg                 
                 widget:emit_signal("widget::redraw_needed")                                           
             end
+		end)
+		
+		helpers.async(string.format("%s %s", props.usage_cmd, props.usage_path), function(usage_str)			
+			for cpu_i, user, nice, system, idle, iowait, irq, softirq in string.gmatch(usage_str, "cpu(%d+) (%d+) (%d+) (%d+) (%d+) (%d+) (%d+) (%d+)") do -- i ignore guest
+				local i = cpu_i + 1
+				local currIdle =  tonumber(idle) + tonumber(iowait)
+
+				local currNonIdle = tonumber(user) + tonumber(nice) + tonumber(system) + tonumber(irq) + tonumber(softirq)
+				
+				local currTotal = currIdle + currNonIdle
+				
+				local delta_total = currTotal - (props.total_last[i] or 0)				
+				local delta_idle = currIdle - (props.idle_last[i] or 0)
+
+				
+				props.load_percentage[i] = math.floor(100 * 100 * (delta_total - delta_idle) / delta_total) / 100
+				props.total_last[i] = currTotal
+				props.idle_last[i] = currIdle				
+			end
+			widget:emit_signal("widget::redraw_needed")    
+            
         end)
     end
 
 
-    helpers.newtimer(string.format("cpu_temp-%s-%s", props.cmd, props.path), 5, widget.update_props)
+	-- button / keybindings
+    widget:buttons(awful.util.table.join(
+        awful.button({}, 1, function() -- left click                        
+            widget.update_props()
+        end)
+    ))
+
+    helpers.newtimer(string.format("cpu_temp-%s-%s", props.cmd, props.path), 10, widget.update_props)
 
     return widget
 end

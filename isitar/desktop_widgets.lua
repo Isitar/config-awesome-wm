@@ -4,8 +4,8 @@ local wibox = require("wibox")
 
 -- define widgets
 local function setup(beautiful)
-    local cpu_temp = require("isitar.widgets.cpu_temp")
-    cpu_temp_widget = cpu_temp({
+    local cpu_stat = require("isitar.widgets.cpu_stat")
+    cpu_stat_widget = cpu_stat({
         main_color = gears.color(beautiful.sound_bar_volume_color),
         max_width = 50,
         font_family = beautiful.font_family,
@@ -27,7 +27,7 @@ local function setup(beautiful)
         --        
         
         widgets = {
-            cpu_temp_widget,
+            cpu_stat_widget,
             dummy,
             dummy,
         }
@@ -37,8 +37,7 @@ local function setup(beautiful)
 
         x0 = s.geometry.x 
         y0 = s.geometry.y + widget_height / 2
-
-        -- wiwidth, wiheight = cpu_temp_widget.fit(s.geometry.width, widget_height)
+        
         for i=0,#widgets -1  do
             -- custom wibox
             wibox({

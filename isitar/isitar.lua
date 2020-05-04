@@ -224,7 +224,8 @@ awful.screen.connect_for_each_screen(function(s)
     start_menu = awful.menu({ items = start_menu_items })
 
     start_menu_launcher = awful.widget.launcher({ image = beautiful.start_icon,
-                                         menu = start_menu })
+                                         menu = start_menu                                         
+                                         })
 
 
     -- Add widgets to the wibox
