@@ -3,6 +3,7 @@ local awful = require("awful")
 local base = require("wibox.widget.base")
 local helpers  = require("lain.helpers")
 local cairo = require("lgi").cairo
+local wibox = require("wibox")
 
 -- notifier for debug
 local naughty = require("naughty")
@@ -18,7 +19,8 @@ local function factory(args)
     props.path = args.path or "/sys/class/hwmon/hwmon2/temp1_input"
     -- style args
     props.main_color = args.main_color or gears.color("#00ff00")
-    props.danger_color = args.danger_color or gears.color("#ff0000")
+	props.danger_color = args.danger_color or gears.color("#ff0000")
+	props.danger_threshold_deg = args.danger_threshold_deg or 75
     props.font_family = args.font_family or "Courier"
     props.font_size = args.font_size or 20
 
@@ -32,10 +34,14 @@ local function factory(args)
         return width, height
     end
 
-    
     -- called when to draw the widget
-    function widget:draw(context, cr, width, height)
-		cr:set_source(props.main_color)
+	function widget:draw(context, cr, width, height)
+		if (props.temp_mdeg / 1000 < props.danger_threshold_deg) then
+			cr:set_source(props.main_color)
+		else
+			cr:set_source(props.danger_color)
+		end
+		
 		
 		-- draw chip
 		x0 = props.padding * width
@@ -69,7 +75,7 @@ local function factory(args)
 		cr:fill() 
 
         
-        cr:move_to(0,3 * height / 4)        
+        cr:move_to(width / 2 + x0, y0 + (height - y0) / 2 )
         cr:select_font_face(props.font_family, cairo.FontSlant.NORMAL, cairo.FontWeight.NORMAL)
         cr:set_font_size(props.font_size)
         cr:show_text(math.floor(props.temp_mdeg / 1000) .. "°")

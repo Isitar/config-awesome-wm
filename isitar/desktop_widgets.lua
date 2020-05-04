@@ -24,7 +24,8 @@ local function setup(beautiful)
         widget = cpu_temp_widget,
         opacity = 1,
         visible = true,
-        type = 'desktop'
+        type = "desktop",
+        bg = "#00000000" -- transparent
     })
     end)
 end
