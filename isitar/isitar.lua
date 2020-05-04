@@ -21,7 +21,6 @@ require("awful.hotkeys_popup.keys")
 -- custom imports
 local lain = require("lain")
 
-
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
@@ -49,7 +48,6 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
--- beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 beautiful.init(gears.filesystem.get_configuration_dir() .. "themes/isitar/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
@@ -85,10 +83,7 @@ awful.layout.layouts = {
 }
 -- }}}
 
--- {{{ Menu
--- Menubar configuration
--- menubar.utils.terminal = terminal -- Set the terminal for applications that require it
--- }}}
+
 
 -- Keyboard map indicator and switcher
 mykeyboardlayout = awful.widget.keyboardlayout()
@@ -149,6 +144,23 @@ local function set_wallpaper(s)
     end
 end
 
+
+-- prepare widgets
+
+-- sound widget
+
+local sb = require("isitar.widgets.sound")
+sb_widget = sb({
+    max_width = 100,
+    main_color = gears.color(beautiful.sound_bar_volume_color),
+    muted_color = gears.color(beautiful.sound_bar_muted_color),
+    num_bars = 20,
+    speaker_padding_top = 0.1,
+    speaker_padding_bottom = 0.1,
+    padding_top = 0.3,
+    padding_bottom = 0.3
+})
+
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 local screen_i = 0
@@ -203,20 +215,7 @@ awful.screen.connect_for_each_screen(function(s)
         height = beautiful.toolbar_height
     })
 
-    -- sound widget
-
-    local sb = require("isitar.widgets.sound")
-    sb_widget = sb({
-        max_width = 100,
-        main_color = gears.color(beautiful.sound_bar_volume_color),
-        muted_color = gears.color(beautiful.sound_bar_muted_color),
-        num_bars = 20,
-        speaker_padding_top = 0.1,
-        speaker_padding_bottom = 0.1,
-        padding_top = 0.3,
-        padding_bottom = 0.3
-    })
-
+  
     -- custom menu
     start_menu_items = {
       { "shutdown", function() awful.spawn("shutdown -h now") end },
@@ -249,6 +248,7 @@ awful.screen.connect_for_each_screen(function(s)
             
         },
     }
+
     screen_i = screen_i + 1
 end)
 -- }}}
@@ -482,6 +482,8 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- }}}
 
 local autostart = require("isitar.autostart")
-autostart.autostart()
+-- autostart.autostart()
 
 
+local desktop_widgets = require("isitar.desktop_widgets")
+desktop_widgets(beautiful)

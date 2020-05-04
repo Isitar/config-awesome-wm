@@ -11,7 +11,10 @@ local themes_path = "~/.config/awesome/themes/" -- gfs.get_themes_dir()
 local theme_path = themes_path.."isitar/"
 local theme = {}
 
-theme.font          = "Open Sans 9"
+theme.font_family = "Open Sans"
+theme.font_size = 9
+
+theme.font          = theme.font_family .. " " .. theme.font_size
 
 theme.colors = {}
 

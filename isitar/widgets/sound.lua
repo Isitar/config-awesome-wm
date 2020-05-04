@@ -1,11 +1,10 @@
 local gears = require("gears")
 local awful = require("awful")
 local base = require("wibox.widget.base")
-local surface = require("gears.surface")
 local helpers  = require("lain.helpers")
 
 -- notifier for debug
-local naughty = require("naughty")
+-- local naughty = require("naughty")
 
 local function factory(args)
     local widget = base.make_widget()
