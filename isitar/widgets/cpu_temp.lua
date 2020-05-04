@@ -21,8 +21,7 @@ local function factory(args)
     props.main_color = args.main_color or gears.color("#00ff00")
 	props.danger_color = args.danger_color or gears.color("#ff0000")
 	props.danger_threshold_deg = args.danger_threshold_deg or 75
-    props.font_family = args.font_family or "Courier"
-    props.font_size = args.font_size or 20
+    props.font_family = args.font_family or "Courier"    
 
 	props.padding = args.padding or 0.1
 
@@ -30,8 +29,12 @@ local function factory(args)
     props.temp_mdeg = 0    
 
     -- function to get the required space
-    function widget:fit(context, width, height)
-        return width, height
+	function widget:fit(context, width, height)		
+		if (width < height * 2) then
+			return width, width /2
+		else 
+			return height * 2, height
+		end
     end
 
     -- called when to draw the widget
@@ -43,15 +46,28 @@ local function factory(args)
 		end
 		
 		
+		if (width < height * 2) then
+			heihgt = width /2
+		else 
+			width = height * 2
+		end
+
+		-- debug rect
+		--cr:move_to(0,0)
+		--cr:rectangle(0,0,width, height)
+		--cr:rectangle(0,0,width / 2, height)
+		--cr:stroke()
+
 		-- draw chip
-		x0 = props.padding * width
+		x0 = props.padding * width / 2
 		y0 = props.padding * height
 
-		chip_width = width / 2 - 2 * props.padding * width
+		chip_width = width / 2 - 2 * props.padding * width / 2
 		pin_length_horz = chip_width / 8
+		dye_width = chip_width - 2 * pin_length_horz
+
 		chip_height = height - 2 * props.padding * height
 		pin_length_vert = chip_height / 8
-		dye_width = chip_width - 2 * pin_length_horz
 		dye_height = chip_height - 2 * pin_length_vert
 
 		-- dye
@@ -74,10 +90,14 @@ local function factory(args)
 		end
 		cr:fill() 
 
-        
-        cr:move_to(width / 2 + x0, y0 + (height - y0) / 2 )
+		font_size = (height - (2 * y0)) / 2
+		
+		-- debug rect
+		-- cr:rectangle(width / 2 + x0, (height - (2 * y0)) - font_size / 2 + y0, width / 2 - 2 * x0, -font_size)
+		-- cr:stroke()
+		cr:move_to(width / 2 + x0, (height - (2 * y0)) - font_size / 2 + y0)
         cr:select_font_face(props.font_family, cairo.FontSlant.NORMAL, cairo.FontWeight.NORMAL)
-        cr:set_font_size(props.font_size)
+        cr:set_font_size(font_size * 1.3)
         cr:show_text(math.floor(props.temp_mdeg / 1000) .. "°")
 
     end

@@ -181,7 +181,6 @@ awful.screen.connect_for_each_screen(function(s)
         local layouts = {l.floating, l.tile, l.tile, l.tile, l.tile, l.tile, l.tile, l.max, l.max}
 
         awful.tag(names, s, layouts)
-
     end
 
     -- Create a promptbox for each screen
@@ -482,7 +481,7 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- }}}
 
 local autostart = require("isitar.autostart")
--- autostart.autostart()
+autostart.autostart()
 
 
 local desktop_widgets = require("isitar.desktop_widgets")
