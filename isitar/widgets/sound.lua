@@ -1,7 +1,7 @@
 local gears = require("gears")
 local awful = require("awful")
 local base = require("wibox.widget.base")
-local helpers  = require("lain.helpers")
+local helpers  = require("isitar.helpers")
 
 -- notifier for debug
 -- local naughty = require("naughty")
