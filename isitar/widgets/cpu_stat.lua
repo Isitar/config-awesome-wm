@@ -9,7 +9,9 @@ local wibox = require("wibox")
 local naughty = require("naughty")
 
 local function factory(args)
-    local widget = base.make_widget()
+	local cpu_img_widget = base.make_widget()
+	local cpu_temp_widget = base.make_widget()
+	local cpu_core_usage_widget = base.make_widget()
 
     local props = {}
 
@@ -32,46 +34,51 @@ local function factory(args)
 	props.idle_last = {0}
 	props.total_last = {0}
 	props.load_percentage = {0}	
+	props.temp_color = props.main_color
 
-    -- function to get the required space
-	function widget:fit(context, width, height)		
-		if (width < height * 2) then
-			return width, width /2
-		else 
-			return height * 2, height
+	function get_temp_color()
+		if (props.temp_mdeg / 1000 < props.temp_danger_threshold_deg) then						
+			return props.main_color
 		end
-    end
-
-    -- called when to draw the widget
-	function widget:draw(context, cr, width, height)
-		if (props.temp_mdeg / 1000 < props.temp_danger_threshold_deg) then
-			cr:set_source(props.main_color)
-		else
-			cr:set_source(props.danger_color)
-		end
+		return props.danger_color
 		
-		
-		if (width < height * 2) then
-			heihgt = width /2
+	end
+
+	function cpu_img_widget:fit(context, width, height)
+		if (width < height) then
+			return width, width
 		else 
-			width = height * 2
+			return height, height
+		end
+	end 
+
+	function debug_rects(cr, x0, y0, width, height, padding)
+		cr:rectangle(x0, y0, width, height)
+		cr:rectangle(padding, padding, width - 2 * padding, height - 2 * padding)		
+		cr:stroke()
+	end
+
+	function cpu_img_widget:draw(context, cr, width, height)
+		cr:set_source(props.temp_color)
+		-- fixed ratio
+		if (width < height) then
+			heihgt = width
+		else 
+			width = height
 		end
 
-		-- debug rect
-		--cr:move_to(0,0)
-		--cr:rectangle(0,0,width, height)
-		--cr:rectangle(0,0,width / 2, height)
-		--cr:stroke()
+		padding = math.min(width, height) * props.padding
+		--debug_rects(cr, 0, 0, width, height, padding)
 
 		-- draw chip
-		x0 = props.padding * width / 2
-		y0 = props.padding * height
+		x0 = padding
+		y0 = padding
 
-		chip_width = width / 2 - 2 * props.padding * width / 2
+		chip_width = width - 2 * padding
 		pin_length_horz = chip_width / 8
 		dye_width = chip_width - 2 * pin_length_horz
 
-		chip_height = height - 2 * props.padding * height
+		chip_height = height - 2 * padding
 		pin_length_vert = chip_height / 8
 		dye_height = chip_height - 2 * pin_length_vert
 
@@ -94,22 +101,47 @@ local function factory(args)
 			cr:rectangle(x0 + pin_length_horz + dye_width, y_offset - horz_pin_height / 2, pin_length_horz, horz_pin_height)			
 		end
 		cr:fill() 
+	end
+
+
+	-- function to get the required space
+	function cpu_temp_widget:fit(context, width, height)		
+		return width / 8, height		
+	end
+    -- called when to draw the widget
+	function cpu_temp_widget:draw(context, cr, width, height)
+		cr:set_source(props.temp_color)
+		padding = math.min(width, height) * props.padding
+		-- debug_rects(cr, 0, 0, width, height, padding)
+		x0 = padding
+		y0 = padding
 
 		font_size = (height - (2 * y0)) / 2
-		
-		-- debug rect
-		-- cr:rectangle(width / 2 + x0, (height - (2 * y0)) - font_size / 2 + y0, width / 2 - 2 * x0, -font_size)
-		-- cr:stroke()
-		cr:move_to(width / 2 + x0, (height - (2 * y0)) - font_size / 2 + y0)
+		cr:move_to(x0, (height - (2 * y0)) - font_size / 2 + y0)
         cr:select_font_face(props.font_family, cairo.FontSlant.NORMAL, cairo.FontWeight.NORMAL)
         cr:set_font_size(font_size * 1.3)
         cr:show_text(math.floor(props.temp_mdeg / 1000) .. "°")
-
+	end
+	
+	-- function to get the required space
+	function cpu_core_usage_widget:fit(context, width, height)		
+		return width / 2, height		
+	end
+    -- called when to draw the widget
+	function cpu_core_usage_widget:draw(context, cr, width, height)		
+		padding = math.min(width, height) * props.padding
+		-- debug_rects(cr, 0, 0, width, height, padding)
+		x0 = padding
+		y0 = padding
+		
 		local cnt = 0
 		cores_per_col = 10
+		col_height = ((height - 2 * padding) / cores_per_col)
+		font_size = col_height / 1.5
 		for i,perc in pairs(props.load_percentage) do
-			x = width + ((i-1) // cores_per_col) * 70
-			y = y0 + ((i-1) % cores_per_col) * 20
+			x = x0 + ((i - 1) // (cores_per_col)) * 70
+			col = (i - 1) % (cores_per_col)
+			y = y0 + (col + 1) * col_height
 		
 			if (perc < 75) then
 				cr:set_source(props.main_color)
@@ -118,20 +150,26 @@ local function factory(args)
 			end
 			
 			cr:move_to(x, y)
-			cr:set_font_size(15)
+			cr:set_font_size(font_size)
 			cr:show_text(i .. ": " .. perc)		
 		end
     end
 
     -- refresh props based on real values
-    function widget:update_props()        
+    function update_props()        
         helpers.async(string.format("%s %s", props.temp_cmd, props.temp_path), function(temp_str)
             local temp_mdeg = tonumber(temp_str)
             
-            if temp_mdeg ~= props.temp_mdegthen then
+            if temp_mdeg ~= props.temp_mdeg then
                 props.temp_mdeg = temp_mdeg                 
-                widget:emit_signal("widget::redraw_needed")                                           
-            end
+                cpu_temp_widget:emit_signal("widget::redraw_needed")
+			end
+			
+			if (get_temp_color() ~= props.color) then
+				props.temp_color = get_temp_color()
+				cpu_temp_widget:emit_signal("widget::redraw_needed")
+				cpu_img_widget:emit_signal("widget::redraw_needed")
+			end 
 		end)
 		
 		helpers.async(string.format("%s %s", props.usage_cmd, props.usage_path), function(usage_str)			
@@ -151,22 +189,28 @@ local function factory(args)
 				props.total_last[i] = currTotal
 				props.idle_last[i] = currIdle				
 			end
-			widget:emit_signal("widget::redraw_needed")    
+			cpu_core_usage_widget:emit_signal("widget::redraw_needed")    
             
         end)
     end
 
+    helpers.newtimer(string.format("cpu_temp-%s-%s", props.cmd, props.path), 10, update_props)
+
+	local ret_widget = wibox.widget ({
+		cpu_img_widget,
+		cpu_temp_widget,
+		cpu_core_usage_widget,
+		layout  = wibox.layout.fixed.horizontal
+	})
 
 	-- button / keybindings
-    widget:buttons(awful.util.table.join(
+    ret_widget:buttons(awful.util.table.join(
         awful.button({}, 1, function() -- left click                        
-            widget.update_props()
+        	update_props()
         end)
     ))
 
-    helpers.newtimer(string.format("cpu_temp-%s-%s", props.cmd, props.path), 10, widget.update_props)
-
-    return widget
+    return ret_widget
 end
 
 return factory

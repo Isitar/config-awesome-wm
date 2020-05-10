@@ -18,6 +18,9 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
 
+-- monitor rendering
+awful.spawn("xrandr --output DP-0 --primary --mode 2560x1440 --rate 60 --output HDMI-0 --mode 1920x1080 --rate 60 --right-of DP-0")
+
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
@@ -48,7 +51,7 @@ end
 beautiful.init(gears.filesystem.get_configuration_dir() .. "themes/isitar/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
-terminal = "gnome-terminal"
+terminal = os.getenv("TERMINAL") or "gnome-terminal"
 editor = os.getenv("EDITOR") or "vi"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -215,7 +218,7 @@ awful.screen.connect_for_each_screen(function(s)
     -- custom menu
     start_menu_items = {
       { "shutdown", function() awful.spawn("shutdown -h now") end },
-      { "restart", function() awful.spawn("shudown -rh now") end }
+      { "restart", function() awful.spawn("reboot") end }
     }
 
     start_menu = awful.menu({ items = start_menu_items })
