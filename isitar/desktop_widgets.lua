@@ -2,6 +2,9 @@ local gears = require("gears")
 local awful = require("awful")
 local wibox = require("wibox")
 
+
+-- local naughty = require("naughty")
+
 -- define widgets
 local function setup(beautiful)
     local cpu_stat = require("isitar.widgets.cpu_stat")
@@ -18,6 +21,17 @@ local function setup(beautiful)
         valign = 'center',
         widget = wibox.widget.textbox,
     }
+
+    local verWibox = wibox.widget {
+        dummy,
+        cpu_stat_widget,
+        dummy,
+        dummy,
+        dummy,
+        layout  = wibox.layout.flex.vertical
+    }
+
+    local screenWibox = {}
     
     local function setupWidgets(s) 
         --  
@@ -26,70 +40,44 @@ local function setup(beautiful)
         --  DISK USAGE
         --        
         
-        widgets = {
-            cpu_stat_widget,
-            dummy,
-            dummy,
-        }
-
+        screen_height = s.geometry.height - beautiful.toolbar_height        
         
-        screen_height = s.geometry.height - beautiful.toolbar_height
-        widget_height = screen_height / (#widgets+ 1)
-        
-
         x0 = s.geometry.x 
         y0 = s.geometry.y
-        
-        
 
-        local wb = wibox.widget( {
-            layout = wibox.layout.flex.vertical,
-            screen = s,
-            visible = true,
-        })
+        if (nil == screenWibox[s]) then
+            screenWibox[s] = wibox({
+                x = x0,
+                y = y0,
+                height = screen_height,
+                width = s.geometry.width,
+                widget = verWibox,
+                spacing = 2,
+                opacity = 1,
+                visible = true,
+                type = "desktop",
+                bg = "#00000000" -- transparent
+            })
+        else                            
+            screenWibox[s].x = x0
+            screenWibox[s].y = y0
+            screenWibox[s].height = screen_height
+            screenWibox[s].width = s.geometry.width
+            screenWibox[s].widget = verWibox
+            screenWibox[s].spacing = 2
+            screenWibox[s].opacity = 1
+            screenWibox[s].visible = true
+            screenWibox[s].type = "desktop"
+            screenWibox[s].bg = "#00000000" -- transparent
 
-        for i=0,#widgets -1  do
-            wb:add(widgets[i + 1])
-            -- custom wibox
-            -- wibox({
-            --     x = x0,
-            --     y = y0 + i * widget_height,                
-            --     width = s.geometry.width,
-            --     height = widget_height,
-            --     screen = s,
-            --     widget = widgets[i + 1],
-            --     opacity = 1,
-            --     visible = true,
-            --     type = "desktop",
-            --     bg = "#00000000" -- transparent
-            -- })
-        end  
-
-        wibox({
-            x = x0,
-            y = y0,
-            height = screen_height,
-            width = s.geometry.width,
-            widget = wibox.widget {
-                dummy,
-                cpu_stat_widget,
-                dummy,
-                dummy,
-                dummy,
-                layout  = wibox.layout.flex.vertical
-            },
-            spacing = 2,
-            opacity = 1,
-            visible = true,
-            type = "desktop",
-            bg = "#00000000" -- transparent
-        })
-        
+            screenWibox[s]:emit_signal("widget::redraw_needed")
+        end
     end
 
 
-    -- screen.connect_signal("property::geometry", setupWidgets)
+    screen.connect_signal("property::geometry", setupWidgets)
     awful.screen.connect_for_each_screen(function(s)
+        screenWibox[s] = nil
         setupWidgets(s)     
     end)
 end

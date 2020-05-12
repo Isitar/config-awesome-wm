@@ -6,7 +6,7 @@ local cairo = require("lgi").cairo
 local wibox = require("wibox")
 
 -- notifier for debug
-local naughty = require("naughty")
+-- local naughty = require("naughty")
 
 local function factory(args)
 	local cpu_img_widget = base.make_widget()
