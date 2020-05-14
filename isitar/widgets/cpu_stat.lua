@@ -15,7 +15,7 @@ local function factory(args)
 
     local props = {}
 
-    args = args or {}
+    local args = args or {}
     -- functional args
     props.temp_cmd = args.temp_cmd or "cat"
 	props.temp_path = args.temp_path or "/sys/class/hwmon/hwmon2/temp1_input"
@@ -36,7 +36,7 @@ local function factory(args)
 	props.load_percentage = {0}	
 	props.temp_color = props.main_color
 
-	function get_temp_color()
+	local function get_temp_color()
 		if (props.temp_mdeg / 1000 < props.temp_danger_threshold_deg) then						
 			return props.main_color
 		end
@@ -52,7 +52,7 @@ local function factory(args)
 		end
 	end 
 
-	function debug_rects(cr, x0, y0, width, height, padding)
+	local function debug_rects(cr, x0, y0, width, height, padding)
 		cr:rectangle(x0, y0, width, height)
 		cr:rectangle(padding, padding, width - 2 * padding, height - 2 * padding)		
 		cr:stroke()
@@ -67,36 +67,36 @@ local function factory(args)
 			width = height
 		end
 
-		padding = math.min(width, height) * props.padding
+		local padding = math.min(width, height) * props.padding
 		--debug_rects(cr, 0, 0, width, height, padding)
 
 		-- draw chip
-		x0 = padding
-		y0 = padding
+		local x0 = padding
+		local y0 = padding
 
-		chip_width = width - 2 * padding
-		pin_length_horz = chip_width / 8
-		dye_width = chip_width - 2 * pin_length_horz
+		local chip_width = width - 2 * padding
+		local pin_length_horz = chip_width / 8
+		local dye_width = chip_width - 2 * pin_length_horz
 
-		chip_height = height - 2 * padding
-		pin_length_vert = chip_height / 8
-		dye_height = chip_height - 2 * pin_length_vert
+		local chip_height = height - 2 * padding
+		local pin_length_vert = chip_height / 8
+		local dye_height = chip_height - 2 * pin_length_vert
 
 		-- dye
 		cr:rectangle(x0 + pin_length_horz, y0 + pin_length_vert, dye_width, dye_height)
 		cr:fill()
 		-- pins
-		num_pins = 6
-		vert_pin_width = dye_width / (10 * num_pins)
+		local num_pins = 6
+		local vert_pin_width = dye_width / (10 * num_pins)
 
 		for i=1,num_pins do
-			x_offset = x0 + pin_length_horz + i * (dye_width / (num_pins + 1))		
+			local x_offset = x0 + pin_length_horz + i * (dye_width / (num_pins + 1))		
 			cr:rectangle(x_offset - vert_pin_width / 2, y0, vert_pin_width, pin_length_vert)					
 			cr:rectangle(x_offset - vert_pin_width / 2, y0 + pin_length_vert + dye_height, vert_pin_width, pin_length_vert)
 		end
-		horz_pin_height = dye_height / (10 * num_pins)
+		local horz_pin_height = dye_height / (10 * num_pins)
 		for i=1,num_pins do
-			y_offset = y0 + pin_length_vert + i * (dye_height / (num_pins + 1))			
+			local y_offset = y0 + pin_length_vert + i * (dye_height / (num_pins + 1))			
 			cr:rectangle(x0, y_offset - horz_pin_height / 2, pin_length_horz, horz_pin_height)		
 			cr:rectangle(x0 + pin_length_horz + dye_width, y_offset - horz_pin_height / 2, pin_length_horz, horz_pin_height)			
 		end
@@ -111,10 +111,10 @@ local function factory(args)
     -- called when to draw the widget
 	function cpu_temp_widget:draw(context, cr, width, height)
 		cr:set_source(props.temp_color)
-		padding = math.min(width, height) * props.padding
+		local padding = math.min(width, height) * props.padding
 		-- debug_rects(cr, 0, 0, width, height, padding)
-		x0 = padding
-		y0 = padding
+		local x0 = padding
+		local y0 = padding
 
 		font_size = (height - (2 * y0)) / 2
 		cr:move_to(x0, (height - (2 * y0)) - font_size / 2 + y0)
@@ -129,19 +129,19 @@ local function factory(args)
 	end
     -- called when to draw the widget
 	function cpu_core_usage_widget:draw(context, cr, width, height)		
-		padding = math.min(width, height) * props.padding
+		local padding = math.min(width, height) * props.padding
 		-- debug_rects(cr, 0, 0, width, height, padding)
-		x0 = padding
-		y0 = padding
+		local x0 = padding
+		local y0 = padding
 		
 		local cnt = 0
-		cores_per_col = 10
-		col_height = ((height - 2 * padding) / cores_per_col)
-		font_size = col_height / 1.5
+		local cores_per_col = 10
+		local col_height = ((height - 2 * padding) / cores_per_col)
+		local font_size = col_height / 1.5
 		for i,perc in pairs(props.load_percentage) do
-			x = x0 + ((i - 1) // (cores_per_col)) * 70
-			col = (i - 1) % (cores_per_col)
-			y = y0 + (col + 1) * col_height
+			local x = x0 + ((i - 1) // (cores_per_col)) * 70
+			local col = (i - 1) % (cores_per_col)
+			local y = y0 + (col + 1) * col_height
 		
 			if (perc < 75) then
 				cr:set_source(props.main_color)
@@ -156,7 +156,7 @@ local function factory(args)
     end
 
     -- refresh props based on real values
-    function update_props()        
+    local function update_props()        
         helpers.async(string.format("%s %s", props.temp_cmd, props.temp_path), function(temp_str)
             local temp_mdeg = tonumber(temp_str)
             
@@ -196,7 +196,7 @@ local function factory(args)
 
     helpers.newtimer(string.format("cpu_temp-%s-%s", props.cmd, props.path), 10, update_props)
 
-	local ret_widget = wibox.widget ({
+	local cpu_ret_widget = wibox.widget ({
 		cpu_img_widget,
 		cpu_temp_widget,
 		cpu_core_usage_widget,
@@ -204,13 +204,13 @@ local function factory(args)
 	})
 
 	-- button / keybindings
-    ret_widget:buttons(awful.util.table.join(
+    cpu_ret_widget:buttons(awful.util.table.join(
         awful.button({}, 1, function() -- left click                        
         	update_props()
         end)
     ))
 
-    return ret_widget
+    return cpu_ret_widget
 end
 
 return factory

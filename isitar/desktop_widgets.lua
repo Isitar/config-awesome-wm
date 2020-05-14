@@ -15,6 +15,14 @@ local function setup(beautiful)
         font_size = beautiful.font_size * 20,
     })
 
+    local mem_stat = require("isitar.widgets.mem_stat")
+    mem_stat_widget = mem_stat({
+        main_color = gears.color(beautiful.sound_bar_volume_color),
+        max_width = 50,
+        font_family = beautiful.font_family,
+        font_size = beautiful.font_size * 20,
+    })
+
     local dummy = wibox.widget{
         markup = '<b>Dummy widget</b>',
         align  = 'center',
@@ -25,7 +33,7 @@ local function setup(beautiful)
     local verWibox = wibox.widget {
         dummy,
         cpu_stat_widget,
-        dummy,
+        mem_stat_widget,
         dummy,
         dummy,
         layout  = wibox.layout.flex.vertical
