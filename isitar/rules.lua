@@ -115,7 +115,7 @@ function rules.rules(beautiful)
         -- Add titlebars to normal clients and dialogs except gnome terminal
         { 
             rule_any = {type = { "normal", "dialog" }},
-            except_any = { class = { "Gnome-terminal"} },
+           -- except_any = { class = { "Gnome-terminal"} },
             properties = { titlebars_enabled = true }
         },
 
