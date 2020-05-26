@@ -27,6 +27,8 @@ local function factory(args)
 	props.temp_danger_threshold_deg = args.temp_danger_threshold_deg or 75
     props.font_family = args.font_family or "Courier"    
 
+	props.cores_per_col = args.cores_per_col or 5
+
 	props.padding = args.padding or 0.1
 
     -- internal props
@@ -106,7 +108,9 @@ local function factory(args)
 
 	-- function to get the required space
 	function cpu_temp_widget:fit(context, width, height)		
-		return width / 8, height		
+		local padding = math.min(width, height) * props.padding
+		local font_size = (height - (2 * padding)) / 2
+		return font_size * 3, height		
 	end
     -- called when to draw the widget
 	function cpu_temp_widget:draw(context, cr, width, height)
@@ -124,8 +128,13 @@ local function factory(args)
 	end
 	
 	-- function to get the required space
-	function cpu_core_usage_widget:fit(context, width, height)		
-		return width / 2, height		
+	function cpu_core_usage_widget:fit(context, width, height)	
+		local padding = math.min(width, height) * props.padding
+		local cores_per_col = props.cores_per_col
+		local col_height = ((height - 2 * padding) / cores_per_col)
+		local font_size = col_height / 1.5
+		local width_requested = font_size * 6 *(24 / cores_per_col) + 2 * padding
+		return width_requested, height		
 	end
     -- called when to draw the widget
 	function cpu_core_usage_widget:draw(context, cr, width, height)		
@@ -135,11 +144,11 @@ local function factory(args)
 		local y0 = padding
 		
 		local cnt = 0
-		local cores_per_col = 10
+		local cores_per_col = props.cores_per_col
 		local col_height = ((height - 2 * padding) / cores_per_col)
 		local font_size = col_height / 1.5
 		for i,perc in pairs(props.load_percentage) do
-			local x = x0 + ((i - 1) // (cores_per_col)) * 70
+			local x = x0 + ((i - 1) // (cores_per_col)) * (font_size * 6)
 			local col = (i - 1) % (cores_per_col)
 			local y = y0 + (col + 1) * col_height
 		
@@ -198,8 +207,8 @@ local function factory(args)
 
 	local cpu_ret_widget = wibox.widget ({
 		cpu_img_widget,
-		cpu_temp_widget,
 		cpu_core_usage_widget,
+		cpu_temp_widget,
 		layout  = wibox.layout.fixed.horizontal
 	})
 
