@@ -58,9 +58,7 @@ local function factory(args)
         cr:fill()
     end
 
-    -- called when to draw the widget
-    function widget:draw(context, cr, width, height)
-        
+    function draw_normal(context, cr, width, height)
         local triangle_width = 0.2 * width;
   
         if (props.muted) then
@@ -93,8 +91,133 @@ local function factory(args)
                 cr:set_source(props.main_color)
             end
             draw_bar(cr, triangle_width + (i * bar_space) + bar_width, pt, bar_width, bar_height)
+        end        
+    end
+
+    function draw_nyan(context, cr, width, height)
+
+        local triangle_width = 0.2 * width;
+  
+        local alpha = 1
+        if (props.muted) then
+            alpha = 0.5
         end
+
+
+        local padding = height / 8
+        local cat_width = height * 1.5
+        local cat_height = height - 2 * padding
+        local cat_head_width = cat_width * 0.3
+        local cat_head_height = cat_height * 0.5
+        local cat_body_width = cat_width * 0.6
+        local bar_height = (height - (2 * padding)) / 6
+
+        local rainbow_width = (width - cat_width) * (props.level / 100)
+
+        local set_gray = function()
+            cr:set_source_rgba(0.5,0.5,0.5,alpha)
+        end
+
+        cr:set_source_rgba(1, 0, 0, alpha)        
+        cr:rectangle(0,0*bar_height + padding,rainbow_width,bar_height)
+        cr:fill()
+        cr:set_source_rgba(1, 0.5, 0, alpha)        
+        cr:rectangle(0,1*bar_height + padding,rainbow_width,bar_height)
+        cr:fill()
+        cr:set_source_rgba(1, 1, 0, alpha)        
+        cr:rectangle(0,2*bar_height + padding,rainbow_width,bar_height)
+        cr:fill()
+        cr:set_source_rgba(0, 1, 0, alpha)        
+        cr:rectangle(0,3*bar_height + padding,rainbow_width,bar_height)
+        cr:fill()
+        cr:set_source_rgba(0, 0, 1, alpha)        
+        cr:rectangle(0,4*bar_height + padding,rainbow_width,bar_height)
+        cr:fill()
+        cr:set_source_rgba(0.5, 0, 1, alpha)        
+        cr:rectangle(0,5*bar_height + padding,rainbow_width,bar_height)
+        cr:fill()
         
+        -- cat body
+        cr:set_source_rgba(1,0,1,alpha)
+        cr:rectangle(rainbow_width, padding, cat_body_width, height - 2 * padding)
+        cr:fill()
+        cr:set_source_rgba(0,0,0,alpha)
+        cr:rectangle(rainbow_width, padding, cat_body_width, height - 2 * padding)
+        cr:stroke()
+
+        -- cat head    
+        local cat_head_x0 = rainbow_width + 0.75 * cat_body_width
+        local cat_head_y0 = padding + cat_height - cat_head_height
+        local cat_head_ear_width = cat_head_width * 0.3
+        local cat_head_ear_height = cat_head_height * 0.3
+        local cat_head_ear2_x0 = cat_head_x0 + cat_head_width - cat_head_ear_width
+        
+        set_gray()
+        --cr:set_source_rgba(0.5,0.5,0.5,alpha)
+        -- ear 1
+        cr:move_to(cat_head_x0, cat_head_y0)
+        cr:line_to(cat_head_x0 + cat_head_ear_width / 2, cat_head_y0 - cat_head_ear_height)
+        cr:line_to(cat_head_x0 + cat_head_ear_width, cat_head_y0)
+        cr:line_to(cat_head_ear2_x0, cat_head_y0)
+        -- ear 2
+        cr:line_to(cat_head_ear2_x0 + cat_head_ear_width / 2, cat_head_y0 - cat_head_ear_height)
+        cr:line_to(cat_head_ear2_x0 + cat_head_ear_width, cat_head_y0)
+        -- rest of head
+        cr:line_to(cat_head_x0 + cat_head_width, cat_head_y0 + cat_head_height)
+        cr:line_to(cat_head_x0, cat_head_y0 + cat_head_height)
+        cr:line_to(cat_head_x0, cat_head_y0)        
+        cr:fill()
+
+        cr:set_source_rgba(0,0,0,alpha)
+        -- ear 1
+        cr:move_to(cat_head_x0, cat_head_y0)
+        cr:line_to(cat_head_x0 + cat_head_ear_width / 2, cat_head_y0 - cat_head_ear_height)
+        cr:line_to(cat_head_x0 + cat_head_ear_width, cat_head_y0)
+        cr:line_to(cat_head_ear2_x0, cat_head_y0)
+        -- ear 2
+        cr:line_to(cat_head_ear2_x0 + cat_head_ear_width / 2, cat_head_y0 - cat_head_ear_height)
+        cr:line_to(cat_head_ear2_x0 + cat_head_ear_width, cat_head_y0)
+        -- rest of head
+        cr:line_to(cat_head_x0 + cat_head_width, cat_head_y0 + cat_head_height)
+        cr:line_to(cat_head_x0, cat_head_y0 + cat_head_height)
+        cr:line_to(cat_head_x0, cat_head_y0)        
+        cr:stroke()
+
+        -- eyes
+        cr:set_line_width(1)
+        cr:set_source_rgba(0,0,0,alpha)
+        cr:rectangle(cat_head_x0 + cat_head_width / 3, cat_head_y0 + padding, padding, padding)
+        cr:stroke()
+        cr:rectangle(cat_head_x0 + 2 * cat_head_width / 3, cat_head_y0 + padding, padding, padding)
+        cr:stroke()
+
+        -- tail
+        set_gray()
+        cr:move_to(rainbow_width, padding + 0.5 * cat_height)
+        cr:line_to(rainbow_width - 0.3 *cat_body_width, padding + 0.25 * cat_height)
+        cr:line_to(rainbow_width, padding + 0.75 * cat_height)
+        cr:fill()
+        cr:set_source_rgba(0,0,0,alpha)
+        cr:move_to(rainbow_width, padding + 0.5 * cat_height)
+        cr:line_to(rainbow_width - 0.3 *cat_body_width, padding + 0.25 * cat_height)
+        cr:line_to(rainbow_width, padding + 0.75 * cat_height)
+        cr:stroke()
+
+        -- feet
+        for i=0,3 do
+            set_gray()
+            cr:rectangle(rainbow_width + i * 0.25 * cat_body_width, padding + cat_height - 0.5 * padding, 0.125 * cat_body_width,  padding)
+            cr:fill()
+            cr:set_source_rgba(0,0,0,alpha)
+            cr:rectangle(rainbow_width + i * 0.25 * cat_body_width, padding + cat_height - 0.5 * padding, 0.125 * cat_body_width,  padding)
+            cr:stroke()
+        end    
+        
+    end
+
+    -- called when to draw the widget
+    function widget:draw(context, cr, width, height)
+        draw_nyan(context, cr, width, height)
     end
 
     -- refresh props based on real values

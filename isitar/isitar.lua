@@ -151,7 +151,7 @@ end
 
 local sb = require("isitar.widgets.sound")
 sb_widget = sb({
-    max_width = 100,
+    max_width = 200,
     main_color = gears.color(beautiful.sound_bar_volume_color),
     muted_color = gears.color(beautiful.sound_bar_muted_color),
     num_bars = 20,
