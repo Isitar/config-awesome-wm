@@ -36,6 +36,15 @@ function helpers.async(cmd, callback)
     end)
 end
 
+
+function helpers.asyncWithErr(cmd, callback, errCallback)
+    return spawn.easy_async(cmd,
+    function (stdout, stderr, reason, exit_code)
+        callback(stdout, exit_code)
+        errCallback('err: ' ..stderr, exit_code)
+    end)
+end
+
 -- like above, but call spawn.easy_async with a shell
 function helpers.async_with_shell(cmd, callback)
     return spawn.easy_async_with_shell(cmd,

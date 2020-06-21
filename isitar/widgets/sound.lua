@@ -4,7 +4,12 @@ local base = require("wibox.widget.base")
 local helpers  = require("isitar.helpers")
 
 -- notifier for debug
--- local naughty = require("naughty")
+local naughty = require("naughty")
+local function message(text)
+	naughty.notify({ preset = naughty.config.presets.critical,
+	title = "",
+	text = text })
+end
 
 local function factory(args)
     local widget = base.make_widget()
@@ -13,8 +18,8 @@ local function factory(args)
 
     props.args = args or {}
     -- functional args
-    props.cmd = args.cmd or "amixer"
-    props.channel = args.channel or "Master"
+    props.cmd = args.cmd or "pactl"
+    props.channel = args.channel or "0"
     -- style args
     props.main_color = args.main_color or gears.color("#00ff00")
     props.muted_color = args.muted_color or gears.color("#ff0000")
@@ -57,8 +62,6 @@ local function factory(args)
     function widget:draw(context, cr, width, height)
         
         local triangle_width = 0.2 * width;
-
-        
   
         if (props.muted) then
             cr:set_source(props.muted_color)            
@@ -96,13 +99,23 @@ local function factory(args)
 
     -- refresh props based on real values
     function widget:update_props()
-        local format_cmd = string.format("%s get %s", props.cmd, props.channel)
-        helpers.async(format_cmd, function(mixer)
-            local vol, playback = string.match(mixer, "([%d]+)%%.*%[([%l]*)")
-            
-            if not vol or not playback then return end
+        -- local format_cmd = string.format("%s list sinks | sed -n -e '/Sink #%s/,/Sink #/ p' | sed -n -e '/Mute:/,/Volume:/ p'", props.cmd, props.channel)
+        local format_cmd = string.format("%s list sinks", props.cmd)
 
-            local muted = playback == "off"
+        helpers.async(format_cmd, function(sinkOutputs)
+
+            local sinkExtractionPattern = string.format('.*Sink #%s(.*)Sink #', props.channel);          
+            local relevantSinkOutput = string.match(sinkOutputs, sinkExtractionPattern)
+            if (nil == relevantSinkOutput) then
+                sinkExtractionPattern = string.format('.*Sink #%s(.*)', props.channel);    
+                relevantSinkOutput = string.match(sinkOutputs, sinkExtractionPattern)                
+            end
+            local mute = string.match(relevantSinkOutput, "Mute: (%w*)")
+            local vol = string.match(relevantSinkOutput, "Volume: front--left: %d+ /%s*(%d*)%%")
+       
+            if not vol or not mute then return end
+
+            local muted = mute == "yes"
 
             if vol ~= props.level or muted ~= props.muted then
                 props.level = tonumber(vol)
@@ -113,30 +126,35 @@ local function factory(args)
     end
 
     function widget:open_mixer()
-        awful.spawn(string.format("%s -e alsamixer", terminal))
+        awful.spawn(string.format("pavucontrol", terminal))
         widget:update_props()
     end
 
-    function widget:toggle_mute()
-        os.execute(string.format("%s set %s toggle", props.cmd, props.channel))
+    function widget:mute()
+        os.execute(string.format("%s set-sink-mute %s 1", props.cmd, props.channel))
+        widget:update_props()
+    end
+
+    function widget:unmute()
+        os.execute(string.format("%s set-sink-mute %s 0", props.cmd, props.channel))
         widget:update_props()
     end
 
     function widget:full_power()
         if (props.muted) then
-            widget:toggle_mute()
+            widget:unmute()
         end
-        os.execute(string.format("%s set %s 100%%", props.cmd, props.channel))
+        os.execute(string.format("%s set-sink-volume %s 100%%", props.cmd, props.channel))
         widget:update_props()
     end
 
     function widget:increse_volume()
-        os.execute(string.format("%s set %s 1%%+", props.cmd, props.channel))
+        os.execute(string.format("%s set-sink-volume %s +1%%", props.cmd, props.channel))
         widget:update_props()
     end
 
     function widget:decrease_volume()
-        os.execute(string.format("%s set %s 1%%-", props.cmd, props.channel))
+        os.execute(string.format("%s set-sink-volume %s -1%%", props.cmd, props.channel))
         widget:update_props()
     end
 
@@ -149,7 +167,11 @@ local function factory(args)
             widget:full_power()
         end),
         awful.button({}, 3, function() -- right click
-           widget:toggle_mute()
+            if (props.muted) then
+                widget:unmute()
+            else 
+                widget:mute()
+            end           
         end),
         awful.button({}, 4, function() -- scroll up
             widget:increse_volume()

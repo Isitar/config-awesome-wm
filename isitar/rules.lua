@@ -112,10 +112,9 @@ function rules.rules(beautiful)
             }
         }, properties = { floating = true }},
 
-        -- Add titlebars to normal clients and dialogs except gnome terminal
+        -- Add titlebars to normal clients and dialogs
         { 
-            rule_any = {type = { "normal", "dialog" }},
-           -- except_any = { class = { "Gnome-terminal"} },
+            rule_any = {type = { "normal", "dialog" }},            
             properties = { titlebars_enabled = true }
         },
 
