@@ -85,6 +85,7 @@ theme.taglist_squares_unsel = theme_assets.taglist_squares_unsel(
 -- menu_[bg|fg]_[normal|focus]
 -- menu_[border_color|border_width]
 
+theme.titlebar_height = dpi(30)
 theme.toolbar_height = dpi(30)
 
 theme.sound_bar_width = dpi(100)
