@@ -52,9 +52,11 @@ local function factory(beautiful)
     end
 
     local function toolbar_content_widget(c)        
-        local focused = client.focus == c
+        local buttons = create_buttons(c)
 
+        local focused = client.focus == c
         local icon_margin = 5
+
         local color = gears.color(beautiful.colors.accent_dark)
         if focused then
             color = gears.color(beautiful.colors.accent)            
@@ -63,32 +65,33 @@ local function factory(beautiful)
         local icon_widget = wibox.widget({
             polyborder({color = color}),
             wibox.container.margin(awful.titlebar.widget.iconwidget(c),icon_margin,icon_margin,icon_margin,icon_margin),               
-            layout  = wibox.layout.stack
+            layout  = wibox.layout.stack,
+            buttons = buttons,
         })
 
-        local middle_widget = wibox.widget(
+        local middle_widget = wibox.widget({
+            line({color = color}),
             {
-
-                line({color = color}),
                 {
-                    {
-                        { -- Title
-                            align  = "center",
-                            widget = awful.titlebar.widget.titlewidget(c)
-                        },                    
-                        layout  = wibox.layout.flex.horizontal, 
-                    },
-                    polyborder({color = color}),
-                    layout  = wibox.layout.stack
+                    { -- Title
+                        align  = "center",
+                        widget = awful.titlebar.widget.titlewidget(c)
+                    },                    
+                    layout  = wibox.layout.flex.horizontal, 
                 },
-                line({color = color}),
-                layout  = wibox.layout.flex.horizontal, 
+                polyborder({color = color}),
+                layout  = wibox.layout.stack
+            },
+            line({color = color}),
+            layout  = wibox.layout.flex.horizontal, 
+            buttons = buttons,
         })
 
 
         local right_widget = wibox.widget({
+            polyborder({color = color}),
             wibox.container.margin(
-                wibox.widget({
+                wibox.widget({                
                     awful.titlebar.widget.minimizebutton(c),
                     awful.titlebar.widget.maximizedbutton(c),
                     awful.titlebar.widget.closebutton    (c),
@@ -96,19 +99,16 @@ local function factory(beautiful)
                 }),
                 icon_margin,icon_margin,icon_margin,icon_margin
             ),
-            polyborder({color = color}),
             layout  = wibox.layout.stack
         })
 
-        local buttons = create_buttons(c)
         
         return 
         wibox.container.background(
         wibox.container.margin(wibox.widget({
             icon_widget,
             middle_widget,
-            right_widget,
-            buttons = buttons,            
+            right_widget,    
             layout = wibox.layout.align.horizontal
         }), 1,1,1,1),
             beautiful.bg_normal
