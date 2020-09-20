@@ -66,10 +66,10 @@ modkey = "Mod4"
 awful.layout.layouts = {
     awful.layout.suit.floating,
     awful.layout.suit.tile,
---    awful.layout.suit.tile.left,
---    awful.layout.suit.tile.bottom,
---    awful.layout.suit.tile.top,
---    awful.layout.suit.fair,
+    awful.layout.suit.tile.left,
+    awful.layout.suit.tile.bottom,
+    awful.layout.suit.tile.top,
+    awful.layout.suit.fair,
     awful.layout.suit.fair.horizontal,
 --    awful.layout.suit.spiral,
 --    awful.layout.suit.spiral.dwindle,
@@ -161,6 +161,12 @@ sb_widget = sb({
     padding_bottom = 0.3
 })
 
+
+musicTag = "♬"
+codeTag = "< />"
+chatTag = "🗩"
+
+
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 local screen_i = 0
@@ -170,15 +176,15 @@ awful.screen.connect_for_each_screen(function(s)
 
     if screen_i == 0 then
         -- Each screen has its own tag table.
-        local names = {"main", "2", "3", "4", "5", "6", "7", "music", "max" }
+        local names = {"floating", codeTag, "3", "4", "5", "6", "7", musicTag, "max" }
         local l = awful.layout.suit
-        local layouts = {l.floating, l.fair.horizontal, l.tile, l.tile, l.tile, l.tile, l.tile, l.max, l.max}
+        local layouts = {l.floating, l.tile.left, l.tile, l.tile, l.tile, l.tile, l.tile, l.max, l.max}
 
         awful.tag(names, s, layouts)
     else
-        local names = {"1", "2", "3", "4", "5", "6", "7", "browser", "discord" }
+        local names = {"1", "flaoting", "3", "4", "5", "6", "7", "🌐", chatTag }
         local l = awful.layout.suit
-        local layouts = {l.floating, l.tile, l.tile, l.tile, l.tile, l.tile, l.tile, l.max, l.max}
+        local layouts = {l.tile, l.floating, l.tile, l.tile, l.tile, l.tile, l.tile, l.max, l.max}
 
         awful.tag(names, s, layouts)
     end
@@ -208,13 +214,13 @@ awful.screen.connect_for_each_screen(function(s)
     }
 
     -- Create the wibox
-    s.mywibox = awful.wibar({ 
-        position = "bottom", 
+    s.mywibox = awful.wibar({
+        position = "bottom",
         screen = s,
         height = beautiful.toolbar_height
     })
 
-  
+
     -- custom menu
     start_menu_items = {
       { "shutdown", function() awful.spawn("shutdown -h now") end },
@@ -224,7 +230,7 @@ awful.screen.connect_for_each_screen(function(s)
     start_menu = awful.menu({ items = start_menu_items })
 
     start_menu_launcher = awful.widget.launcher({ image = beautiful.start_icon,
-                                         menu = start_menu                                         
+                                         menu = start_menu
                                          })
 
 
@@ -242,7 +248,7 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
             mykeyboardlayout,
             wibox.widget.systray(),
-            mytextclock,    
+            mytextclock,
             sb_widget,
             s.mylayoutbox
         },
@@ -340,11 +346,11 @@ globalkeys = gears.table.join(
               end,
               {description = "restore minimized", group = "client"}),
 
-    awful.key({ modkey }, "r", 
-              function () 
-                  awful.util.spawn("dmenu_run") 
+    awful.key({ modkey }, "r",
+              function ()
+                  awful.util.spawn("dmenu_run")
               end,
-              {description = "run dmenu", group = "launcher"}),    
+              {description = "run dmenu", group = "launcher"}),
 
 
     -- Menubar
@@ -411,7 +417,7 @@ end
 root.keys(globalkeys)
 -- }}}
 
--- Load rules 
+-- Load rules
 local rules = require("isitar.rules");
 awful.rules.rules = rules.rules(beautiful);
 
@@ -438,18 +444,18 @@ titlebar(beautiful)
 --    c:emit_signal("request::activate", "mouse_enter", {raise = false})
 --end)
 
-client.connect_signal("focus", function(c) 
-    c.border_color = beautiful.border_focus 
+client.connect_signal("focus", function(c)
+    c.border_color = beautiful.border_focus
     c.border_width = 0
 end)
 client.connect_signal("unfocus", function(c)
-     c.border_color = beautiful.border_normal 
+     c.border_color = beautiful.border_normal
      c.border_width = 0
     end)
 -- }}}
 
 local autostart = require("isitar.autostart")
--- autostart.autostart()
+autostart.autostart()
 
 
 local desktop_widgets = require("isitar.desktop_widgets")

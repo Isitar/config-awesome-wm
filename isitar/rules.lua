@@ -45,7 +45,10 @@ clientkeys = gears.table.join(
             c.maximized_horizontal = not c.maximized_horizontal
             c:raise()
         end ,
-        {description = "(un)maximize horizontally", group = "client"})
+        {description = "(un)maximize horizontally", group = "client"}),
+
+    awful.key({modkey, "Control"}, "t", function(c) awful.titlebar.toggle(c) end,
+            {description = "toggle titlebar", group = "client"})
 )
 
 clientbuttons = gears.table.join(
@@ -113,28 +116,28 @@ function rules.rules(beautiful)
         }, properties = { floating = true }},
 
         -- Add titlebars to normal clients and dialogs
-        { 
-            rule_any = {type = { "normal", "dialog" }},            
+        {
+            rule_any = {type = { "normal", "dialog" }},
             properties = { titlebars_enabled = true }
         },
 
         -- Set Discord to always map on the tag named "discord" on screen 2.
         {
             rule = { class = "[Dd]iscord" },
-            properties = { screen = 2, tag = "discord" } 
+            properties = { screen = 2, tag = chatTag }
         },
         -- spotify always in music tag on screen 1
         {
-            rule = { class = "[Ss]potify"}, 
-            properties = { screen = 1, tag = "music"} 
+            rule = { class = "[Ss]potify"},
+            properties = { screen = 1, tag = musicTag}
         },
-    }    
+    }
 end
 
 -- extended rule because spotify does not have class property on startup
 client.connect_signal("property::class", function(c)
      if "Spotify" == c.class then
-         local t = awful.tag.find_by_name(nil, "music")
+         local t = awful.tag.find_by_name(nil, musicTag)
          c:move_to_tag(t)
      end
 end)
