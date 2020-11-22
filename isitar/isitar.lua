@@ -359,7 +359,10 @@ globalkeys = gears.table.join(
 
     -- Applications
     awful.key({ modkey }, "b", function() awful.spawn("firefox") end,
-              {description = "starts firefox", group = "applications"})
+              {description = "starts firefox", group = "applications"}),
+
+    awful.key({}, "Print", function() awful.spawn("gnome-screenshot -i") end,
+              {description = "starts printscreen", group = "applications"})
 
 )
 

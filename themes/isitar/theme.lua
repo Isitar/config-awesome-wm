@@ -44,7 +44,7 @@ theme.fg_focus      = "#ffffff"
 theme.fg_urgent     = "#ffffff"
 theme.fg_minimize   = "#ffffff"
 
-theme.useless_gap   = dpi(4)
+theme.useless_gap   = dpi(2)
 theme.border_width  = dpi(2)
 theme.border_normal = theme.colors.primary_dark
 theme.border_focus  = theme.colors.primary_light
