@@ -24,7 +24,7 @@ local function setup(beautiful)
     })
 
     local dummy = wibox.widget{
-        markup = '<b>Dummy widget</b>',
+        markup = '<b> </b>',
         align  = 'center',
         valign = 'center',
         widget = wibox.widget.textbox,
@@ -40,17 +40,17 @@ local function setup(beautiful)
     }
 
     local screenWibox = {}
-    
-    local function setupWidgets(s) 
-        --  
+
+    local function setupWidgets(s)
+        --
         --  CPU USAGE / TEMP
         --  MEM USAGE
         --  DISK USAGE
-        --        
-        
-        screen_height = s.geometry.height - beautiful.toolbar_height        
-        
-        x0 = s.geometry.x 
+        --
+
+        screen_height = s.geometry.height - beautiful.toolbar_height
+
+        x0 = s.geometry.x
         y0 = s.geometry.y
 
         if (nil == screenWibox[s]) then
@@ -66,7 +66,7 @@ local function setup(beautiful)
                 type = "desktop",
                 bg = "#00000000" -- transparent
             })
-        else                            
+        else
             screenWibox[s].x = x0
             screenWibox[s].y = y0
             screenWibox[s].height = screen_height
@@ -86,7 +86,7 @@ local function setup(beautiful)
     screen.connect_signal("property::geometry", setupWidgets)
     awful.screen.connect_for_each_screen(function(s)
         screenWibox[s] = nil
-        setupWidgets(s)     
+        setupWidgets(s)
     end)
 end
 
