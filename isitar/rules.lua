@@ -131,6 +131,11 @@ function rules.rules(beautiful)
             rule = { class = "[Ss]potify"},
             properties = { screen = 1, tag = musicTag}
         },
+        -- evolution always in message tag on screen 2
+        {
+            rule = { class = "[Ee]volution"},
+            properties = { screen = 2, tag = chatTag}
+        },
     }
 end
 
